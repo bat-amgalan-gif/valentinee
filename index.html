@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}</style>
+</head>
+<body>
+<title>Be My Valentine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  /* Layout: one centered column. Heart on top, question, then YES grows while NO shrinks beneath it. */
+  :root {
+    --bg: #fde9ec;
+    --fg: #4a1424;
+    --muted: #8a4a5a;
+    --heart: #e0405f;
+    --heart-deep: #b02444;
+    --face: #fff4f5;
+    --yes: #e0405f;
+    --yes-fg: #ffffff;
+    --no-bg: #f6cfd6;
+    --no-fg: #6e2a3c;
+    --tear: #6fb4e8;
+    --font-display: "Caveat", "Segoe Print", "Comic Sans MS", cursive;
+    --font-body: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #2a0f1a; --fg: #ffe6ea; --muted: #d99aa9;
+      --heart: #ff5c7c; --heart-deep: #d63a5b; --face: #3a1422;
+      --yes: #ff5c7c; --yes-fg: #2a0f1a; --no-bg: #4a2030; --no-fg: #f6cfd6;
+      --tear: #7cc2f2; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #2a0f1a; --fg: #ffe6ea; --muted: #d99aa9;
+    --heart: #ff5c7c; --heart-deep: #d63a5b; --face: #3a1422;
+    --yes: #ff5c7c; --yes-fg: #2a0f1a; --no-bg: #4a2030; --no-fg: #f6cfd6;
+    --tear: #7cc2f2; color-scheme: dark;
+  }
+
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    padding-inline: 16px;
+    overflow-x: hidden;
+  }
+  main {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    text-align: center;
+    padding-block: 24px;
+    max-width: 560px;
+    margin-inline: auto;
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 11vw, 4rem);
+    line-height: 1.05;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .caption {
+    min-height: 1.6em;
+    margin: 0;
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 1.05rem;
+  }
+  .heart { width: min(46vw, 190px); height: auto; overflow: visible; }
+  .heart .body { fill: var(--heart); }
+  .heart .eye { fill: var(--face); }
+  .heart .mouth { fill: none; stroke: var(--face); stroke-width: 4; stroke-linecap: round; }
+  .heart .tear { fill: var(--tear); opacity: 0; transition: opacity .3s; }
+  .heart.sad .tear { opacity: 1; animation: drip 1.4s ease-in infinite; }
+  .heart.sad .tear.b { animation-delay: .5s; }
+  .heart { animation: beat 1.6s ease-in-out infinite; transform-origin: 50% 60%; }
+  .heart.sad { animation-duration: 3s; }
+  @keyframes beat { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+  @keyframes drip { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(26px); opacity: 0; } }
+
+  .answers {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+  }
+  button {
+    font-family: var(--font-body);
+    font-weight: 800;
+    border: 0;
+    cursor: pointer;
+    border-radius: 999px;
+    max-width: 100%;
+    transition: font-size .25s ease, padding .25s ease, transform .1s ease;
+  }
+  button:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
+  button:active { transform: scale(.97); }
+  #yes {
+    background: var(--yes);
+    color: var(--yes-fg);
+    font-size: 1.3rem;
+    padding: .55em 1.6em;
+    box-shadow: 0 6px 0 var(--heart-deep);
+  }
+  #no {
+    background: var(--no-bg);
+    color: var(--no-fg);
+    font-size: 1rem;
+    padding: .6em 1.4em;
+  }
+
+  .win { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .win p { margin: 0; color: var(--muted); font-weight: 600; font-size: 1.1rem; }
+  .float-heart {
+    position: fixed;
+    bottom: -40px;
+    width: 26px; height: 24px;
+    pointer-events: none;
+    animation: rise linear forwards;
+    color: var(--heart);
+  }
+  @keyframes rise { to { transform: translateY(-115vh) rotate(25deg); opacity: .2; } }
+  @media (prefers-reduced-motion: reduce) {
+    .heart, .heart.sad, .heart.sad .tear { animation: none; }
+    .float-heart { display: none; }
+    button { transition: none; }
+  }
+</style>
+
+<main id="stage">
+  <svg class="heart" id="heart" viewBox="0 0 120 112" aria-hidden="true">
+    <path class="body" d="M60 104 C20 74 6 52 6 34 C6 17 19 6 33 6 C45 6 55 12 60 23 C65 12 75 6 87 6 C101 6 114 17 114 34 C114 52 100 74 60 104Z"/>
+    <circle class="eye" cx="43" cy="44" r="6"/>
+    <circle class="eye" cx="77" cy="44" r="6"/>
+    <path class="mouth" id="mouth" d="M44 62 Q60 78 76 62"/>
+    <ellipse class="tear a" cx="36" cy="56" rx="3.5" ry="5"/>
+    <ellipse class="tear b" cx="84" cy="56" rx="3.5" ry="5"/>
+  </svg>
+
+  <div id="ask">
+    <h1>Will you be my Valentine?</h1>
+    <p class="caption" id="caption" aria-live="polite">&nbsp;</p>
+  </div>
+
+  <div class="answers" id="answers">
+    <button id="yes" type="button">YES</button>
+    <button id="no" type="button">NO</button>
+  </div>
+</main>
+
+<script>
+  var noLabels = [
+    "NO", "Why no?", "Really?", "Are you sure?", "I'm really sad...",
+    "Ooohh noo", "Please?", "I'll cry...", "Think again", "Pretty please",
+    "You're breaking my heart", "Last chance..."
+  ];
+  var captions = [
+    "", "Why not though?", "Look at this face.", "Take a second to think.",
+    "My heart is breaking a little.", "Ooohh noo...", "I'll be good, I promise.",
+    "I'm already crying.", "The YES button is right there.", "It keeps getting bigger.",
+    "It's honestly easier to say yes.", "Okay, just press YES."
+  ];
+  var mouths = {
+    happy: "M44 62 Q60 78 76 62",
+    flat: "M46 68 L74 68",
+    sad: "M46 74 Q60 60 74 74"
+  };
+  var n = 0;
+  var yes = document.getElementById("yes");
+  var no = document.getElementById("no");
+  var heart = document.getElementById("heart");
+  var mouth = document.getElementById("mouth");
+  var caption = document.getElementById("caption");
+
+  function render() {
+    var yesSize = Math.min(1.3 + n * 0.7, 7);
+    yes.style.fontSize = "min(" + yesSize + "rem, 16vw)";
+    var noSize = Math.max(1 * Math.pow(0.84, n), 0.25);
+    no.style.fontSize = noSize + "rem";
+    no.textContent = noLabels[Math.min(n, noLabels.length - 1)];
+    caption.textContent = captions[Math.min(n, captions.length - 1)] || " ";
+    mouth.setAttribute("d", n === 0 ? mouths.happy : n < 3 ? mouths.flat : mouths.sad);
+    heart.classList.toggle("sad", n >= 4);
+    if (n >= noLabels.length) { no.hidden = true; }
+  }
+
+  no.addEventListener("click", function () {
+    n += 1;
+    render();
+  });
+
+  function floatHearts() {
+    for (var i = 0; i < 28; i++) {
+      var el = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      el.setAttribute("viewBox", "0 0 120 112");
+      el.setAttribute("class", "float-heart");
+      el.innerHTML = '<path fill="currentColor" d="M60 104 C20 74 6 52 6 34 C6 17 19 6 33 6 C45 6 55 12 60 23 C65 12 75 6 87 6 C101 6 114 17 114 34 C114 52 100 74 60 104Z"/>';
+      el.style.left = Math.random() * 100 + "vw";
+      var s = 0.6 + Math.random() * 1.4;
+      el.style.width = 26 * s + "px";
+      el.style.height = 24 * s + "px";
+      el.style.animationDuration = 3 + Math.random() * 4 + "s";
+      el.style.animationDelay = Math.random() * 1.5 + "s";
+      document.body.appendChild(el);
+    }
+  }
+
+  yes.addEventListener("click", function () {
+    document.getElementById("ask").innerHTML =
+      '<div class="win"><h1>Yay! I knew it!</h1><p>See you on Valentine’s Day.</p></div>';
+    document.getElementById("answers").hidden = true;
+    heart.classList.remove("sad");
+    mouth.setAttribute("d", mouths.happy);
+    floatHearts();
+  });
+
+  render();
+</script>
+
+</body>
+</html>
